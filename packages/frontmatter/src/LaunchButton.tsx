@@ -13,6 +13,23 @@ import {
 } from '@radix-ui/react-icons';
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 import { BinderIcon, JupyterIcon } from '@scienceicons/react/24/solid';
+
+/**
+ * Google Colab icon component
+ */
+function ColabIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      width="24"
+      height="24"
+    >
+      <path d="M16.9414 4.9757a7.033 7.033 0 0 0-4.9308 2.0646 7.033 7.033 0 0 0-.1232 9.8068l2.395-2.395a3.6455 3.6455 0 0 1 5.1497-5.1478l2.397-2.3989a7.033 7.033 0 0 0-4.8877-1.9297zM7.07 4.9855a7.033 7.033 0 0 0-4.8878 1.9316l2.3911 2.3911a3.6434 3.6434 0 0 1 5.0227.1271l1.7341-2.9737-.0997-.0802A7.033 7.033 0 0 0 7.07 4.9855zm12.0595 5.2836-1.7616 2.9546a3.6455 3.6455 0 0 1-.1232 5.0014l2.3969 2.3969a7.033 7.033 0 0 0-0.512-10.353zM5.1233 10.4867a3.6455 3.6455 0 0 1-.1193 5.1497l-2.395 2.3969a7.033 7.033 0 0 0 9.8087-.1232l-1.736-2.9757a3.6455 3.6455 0 0 1-5.009-.0996l-.5765.9906z" />
+    </svg>
+  );
+}
 import * as Form from '@radix-ui/react-form';
 import type { ExpandedThebeFrontmatter, BinderHubOptions } from 'myst-frontmatter';
 
@@ -196,6 +213,36 @@ function cloneNameFromRepo(repo: string) {
   const url = new URL(repo);
   const parts = url.pathname.slice(1).split('/');
   return parts[parts.length - 1] || url.hostname;
+}
+
+/**
+ * Make a Google Colab URL for a notebook
+ *
+ * @param options - Binder options containing repo info
+ * @param location - Path to the notebook file
+ * @returns Colab URL or undefined if not applicable
+ */
+function makeColabURL(options: BinderHubOptions, location: string): string | undefined {
+  // Colab only works with .ipynb files
+  if (!location.endsWith('.ipynb')) {
+    return undefined;
+  }
+
+  // Colab only works with GitHub repos
+  if (options.provider !== 'github' || !options.repo) {
+    return undefined;
+  }
+
+  const match = options.repo.match(GITHUB_USERNAME_REPO_REGEX);
+  if (!match) {
+    return undefined;
+  }
+
+  const [, org, repo] = match;
+  const ref = options.ref || 'main';
+  const cleanLocation = location.replace(/^\//, '');
+
+  return `https://colab.research.google.com/github/${org}/${repo}/blob/${ref}/${cleanLocation}`;
 }
 
 /**
@@ -423,12 +470,38 @@ function DetectLaunchContent(props: ModalLaunchProps) {
     [defaultBinderBaseURL, buildLink, onLaunch],
   );
 
+  // Generate Colab URL if applicable
+  const colabUrl = binder ? makeColabURL(binder, location) : undefined;
+
   return (
-    <Form.Root onSubmit={handleSubmit} ref={formRef}>
+    <>
+      {/* Quick launch buttons for known services */}
+      {colabUrl && (
+        <div className="myst-fm-launch-quick mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+          <p className="text-[14px] font-medium mb-2 text-gray-600 dark:text-gray-300">
+            Quick Launch
+          </p>
+          <div className="flex flex-row gap-2">
+            <a
+              href={colabUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => onLaunch?.()}
+              className="myst-fm-launch-colab inline-flex flex-row gap-1.5 h-[35px] items-center justify-center rounded px-3 font-medium leading-none bg-[#F9AB00] hover:bg-[#E09800] outline-none text-white focus:shadow-[0_0_0_2px] focus:shadow-black focus:outline-none"
+            >
+              <ColabIcon className="w-[18px] h-[18px]" />
+              <span>Open in Colab</span>
+              <ExternalLinkIcon className="w-[14px] h-[14px]" />
+            </a>
+          </div>
+        </div>
+      )}
+
+      <Form.Root onSubmit={handleSubmit} ref={formRef}>
       <Form.Field className="myst-fm-launch-form mb-2.5 grid" name="url">
         <div className="flex flex-col items-baseline justify-between">
           <Form.Label className="myst-fm-launch-label text-[15px] font-medium leading-[35px]">
-            Enter a JupyterHub or BinderHub URL, e.g.{' '}
+            {colabUrl ? 'Or enter a JupyterHub or BinderHub URL' : 'Enter a JupyterHub or BinderHub URL, e.g.'}{' '}
             <a
               href="https://mybinder.org"
               className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
@@ -569,6 +642,7 @@ function DetectLaunchContent(props: ModalLaunchProps) {
         />
       </fieldset>
     </Form.Root>
+    </>
   );
 }
 
