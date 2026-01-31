@@ -5,6 +5,7 @@ module.exports = {
   serverBuildPath: 'build/index.js',
   serverModuleFormat: 'cjs',
   serverMinify: true,
+  sourcemap: false,
   publicPath: '/myst_assets_folder/',
   ignoredRouteFiles: ['**/.*'],
   serverDependenciesToBundle: [/.*/],
