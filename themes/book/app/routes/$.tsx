@@ -4,7 +4,7 @@ import {
   type LinksFunction,
   type LoaderFunction,
 } from '@remix-run/node';
-import { getProject, isFlatSite, type PageLoader } from '@myst-theme/common';
+import { getProject, isFlatSite, parsePathname, type PageLoader } from '@myst-theme/common';
 import {
   KatexCSS,
   useOutlineHeight,
@@ -63,7 +63,7 @@ export const meta: V2_MetaFunction<typeof loader> = ({ data, matches, location }
 export const links: LinksFunction = () => [KatexCSS];
 
 export const loader: LoaderFunction = async ({ params, request }) => {
-  const [first, ...rest] = new URL(request.url).pathname.slice(1).split('/');
+  const [first, ...rest] = parsePathname(new URL(request.url).pathname);
   const config = await getConfig();
   const project = getProject(config, first);
   const projectName = project?.slug === first ? first : undefined;
@@ -100,11 +100,12 @@ function ArticlePageAndNavigationInternal({
       <TabStateProvider>
         {projectParts?.banner && <Banner content={projectParts.banner.mdast} />}
       </TabStateProvider>
-      <TopNav hideToc={hide_toc} hideSearch={hideSearch} />
+      <TopNav hideToc={hide_toc} hideSearch={hideSearch} navbarEnd={projectParts?.navbar_end?.mdast} />
       <PrimaryNavigation
         sidebarRef={toc}
         hide_toc={hide_toc}
         footer={<SidebarFooter content={projectParts?.primary_sidebar_footer?.mdast} />}
+        navbarEnd={projectParts?.navbar_end?.mdast}
         projectSlug={projectSlug}
       />
       <TabStateProvider>

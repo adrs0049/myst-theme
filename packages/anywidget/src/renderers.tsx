@@ -18,10 +18,7 @@ import { MystAnyModel } from './models.js';
 export function AnyWidgetRenderer({ node }: { node: AnyWidget }) {
   // basic validation
   const esmModuleUrl = node.esm;
-  const isESMModuleUrlValid =
-    esmModuleUrl &&
-    typeof esmModuleUrl === 'string' &&
-    (esmModuleUrl.startsWith('https://') || esmModuleUrl.startsWith('http://'));
+  const isESMModuleUrlValid = esmModuleUrl && typeof esmModuleUrl === 'string';
   const validModel = node.model && typeof node.model === 'object';
 
   const ref = React.useRef<HTMLDivElement>(null);
@@ -70,6 +67,8 @@ export function AnyWidgetRenderer({ node }: { node: AnyWidget }) {
           const shadowRoot = rootEl.shadowRoot ?? rootEl.attachShadow({ mode: 'open' });
           // Create node to render the widget
           widgetRoot = document.createElement('div');
+          widgetRoot.className = classNames('myst-anywidget', node.class);
+          widgetRoot.style.position = 'relative';
           shadowRoot.replaceChildren(widgetRoot);
         } else {
           widgetRoot = rootEl;

@@ -1,5 +1,32 @@
 # myst-to-react
 
+## 1.2.0
+
+### Minor Changes
+
+- 9ecc788: Add grid-item renderer
+
+### Patch Changes
+
+- f8ef1ef: Add both vert and horiz gap for badges
+- Updated dependencies [f908854]
+  - @myst-theme/providers@1.2.0
+
+## 1.1.4
+
+### Patch Changes
+
+- @myst-theme/providers@1.1.4
+
+## 1.1.3
+
+### Patch Changes
+
+- a8b0c87: Support a domain to treat as internal URLs
+- a96413c: Fix ROR rendererwq
+- Updated dependencies [a8b0c87]
+  - @myst-theme/providers@1.1.3
+
 ## 1.1.2
 
 ### Patch Changes
