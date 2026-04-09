@@ -75,13 +75,15 @@ const WrapperElement = ({
   id,
   className,
   children,
+  ariaLabel,
 }: {
   id?: string;
   className?: string;
   children: React.ReactNode;
+  ariaLabel?: string;
 }) => {
   return (
-    <section id={id} className={className}>
+    <section id={id} className={className} role="region" aria-label={ariaLabel}>
       {children}
     </section>
   );
@@ -132,9 +134,12 @@ export function Proof({
   const [isOpen, setIsOpen] = useState(!dropdown);
   const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
 
+  const ariaLabel = [capitalize(kind), enumerator].filter(Boolean).join(' ') || undefined;
+
   return (
     <WrapperElement
       id={identifier}
+      ariaLabel={ariaLabel}
       className={classNames(
         'myst-proof my-5 shadow dark:bg-stone-800 overflow-hidden',
         'dark:border-l-4 border-slate-400',
