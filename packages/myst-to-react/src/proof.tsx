@@ -176,17 +176,17 @@ export function Proof({
           { 'mb-2.5': isOpen && dropdown },
         )}
       >
-        <div
+        <h4
           className={classNames(
             'myst-proof-title text-neutral-900 dark:text-white grow self-center overflow-hidden break-words',
-            'ml-4', // No icon!
+            'ml-4 text-md font-medium my-0', // Reset heading defaults
           )}
         >
           <HashLink id={identifier} kind={capitalize(kind)}>
             {capitalize(kind)} {enumerator}
           </HashLink>{' '}
           {title && <>({title})</>}
-        </div>
+        </h4>
         {dropdown && (
           <div className="self-center flex-none text-sm font-thin text-neutral-700 dark:text-neutral-200">
             <ChevronRightIcon
